@@ -1,18 +1,14 @@
 package org.app.credit.controllers;
 
 import jakarta.validation.Valid;
-import org.app.credit.entities.CreditRequest;
 import org.app.credit.entities.dtos.CreditRequestCreatedDto;
 import org.app.credit.entities.dtos.CreditRequestResponseDto;
 import org.app.credit.services.CreditRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController

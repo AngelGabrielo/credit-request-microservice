@@ -2,6 +2,9 @@ package org.app.credit.services;
 
 import org.app.credit.entities.Role;
 import org.app.credit.entities.User;
+import org.app.credit.entities.dtos.UserRegisterDto;
+import org.app.credit.entities.dtos.UserResponseDto;
+import org.app.credit.entities.mappers.UserMapper;
 import org.app.credit.repositories.RoleRepository;
 import org.app.credit.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +27,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private final UserMapper userMapper;
+
+    public UserServiceImpl(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+
     @Override
-    public User save(User user) {
+    public UserResponseDto save(UserRegisterDto userDto) {
+        User user = userMapper.toEntity(userDto);
+
         Optional<Role> optionalRoleUser = roleRepository.findByName("ROLE_CLIENT");
         List<Role> roles = new ArrayList<>();
 
@@ -39,11 +51,6 @@ public class UserServiceImpl implements UserService {
         user.setRoles(roles);
         user.setEnabled(true);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
-
-    @Override
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
+        return userMapper.toDto(userRepository.save(user));
     }
 }

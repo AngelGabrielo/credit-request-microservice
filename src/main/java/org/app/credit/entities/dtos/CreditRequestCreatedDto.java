@@ -8,16 +8,16 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public record CreditRequestCreatedDto(
-        @NotNull(message = "The amount is required")
-        @Min(value = 1000, message = "The min amount is 1000")
+        @NotNull
+        @Min(value = 1000)
         BigDecimal amount,
 
-        @NotNull(message = "The period is required")
-        @Min(value = 1, message = "The min period is 1 day")
+        @NotNull
+        @Min(value = 1)
         Integer periodDays,
 
-        @NotBlank(message = "The reason is required")
-        @Size(min = 20, message = "The reason must have at least 20 characters")
+        @NotBlank
+        @Size(min = 20)
         String reason
 ) {
 

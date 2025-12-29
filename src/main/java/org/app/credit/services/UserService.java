@@ -1,11 +1,10 @@
 package org.app.credit.services;
 
-import org.app.credit.entities.User;
+import org.app.credit.entities.dtos.UserRegisterDto;
+import org.app.credit.entities.dtos.UserResponseDto;
 
 public interface UserService {
 
-    User save(User user);
-
-    boolean existsByUsername(String username);
+    UserResponseDto save(UserRegisterDto user);
 
 }

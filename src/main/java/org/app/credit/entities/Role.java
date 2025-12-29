@@ -24,6 +24,5 @@ public class Role {
     private String name;
 
     @ManyToMany(mappedBy = "roles")
-    @JsonIgnoreProperties({"roles", "handler", "hibernateLazyInitializer"})
     private List<User> users;
 }
