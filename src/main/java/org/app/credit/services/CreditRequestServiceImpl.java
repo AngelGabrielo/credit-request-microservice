@@ -43,11 +43,10 @@ public class CreditRequestServiceImpl implements CreditRequestService {
     @Override
     @Transactional
     public CreditRequestResponseDto save(CreditRequestCreatedDto creditRequestDto) {
-
-        CreditRequest creditRequest = mapper.toEntity(creditRequestDto);
-
         User user = userRepository.findByUsername(getUsername())
                 .orElseThrow(() -> new BusinessException("User not found"));
+
+        CreditRequest creditRequest = mapper.toEntity(creditRequestDto);
 
         creditRequest.setState(RequestStateEnum.PENDING);
         creditRequest.setUser(user);
