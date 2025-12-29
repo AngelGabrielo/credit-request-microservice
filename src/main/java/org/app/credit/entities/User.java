@@ -53,9 +53,4 @@ public class User {
         creditRequests = new ArrayList<>();
     }
 
-    public void addCreditRequest(CreditRequest creditRequest) {
-        creditRequests.add(creditRequest);
-        creditRequest.setUser(this);
-    }
-
 }

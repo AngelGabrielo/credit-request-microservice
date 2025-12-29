@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.app.credit.entities.User;
+import org.app.credit.security.TokenJwtConfig;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,10 +29,13 @@ import static org.app.credit.security.TokenJwtConfig.*;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final TokenJwtConfig tokenJwtConfig;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, TokenJwtConfig tokenJwtConfig) {
         this.authenticationManager = authenticationManager;
+        this.tokenJwtConfig = tokenJwtConfig;
     }
 
     @Override
@@ -72,9 +76,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String token = Jwts.builder()
                 .subject(username)
                 .claims(claims)
-                .expiration(new Date(System.currentTimeMillis() + 36000000))
+                .expiration(new Date(System.currentTimeMillis() + tokenJwtConfig.getExpiration()))
                 .issuedAt(new Date())
-                .signWith(SECRET_KEY)
+                .signWith(tokenJwtConfig.getSecretKey())
                 .compact();
 
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);

@@ -20,8 +20,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SpringSecurityConfig {
 
+    private final TokenJwtConfig tokenJwtConfig;
+
     @Autowired
     private AuthenticationConfiguration authenticationConfiguration;
+
+    public SpringSecurityConfig(TokenJwtConfig tokenJwtConfig) {
+        this.tokenJwtConfig = tokenJwtConfig;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,8 +45,8 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/requests/**").hasAnyRole("CLIENT", "ANALYST")
                         .requestMatchers(HttpMethod.GET, "/requests/evaluate/**").hasRole("ANALYST")
                         .anyRequest().authenticated())
-                .addFilter(new JwtAuthenticationFilter(authManager))
-                .addFilter(new JwtValidationFilter(authManager))
+                .addFilter(new JwtAuthenticationFilter(authManager, tokenJwtConfig))
+                .addFilter(new JwtValidationFilter(authManager, tokenJwtConfig))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();

@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.app.credit.security.SimpleGrantedAuthorityJsonCreator;
+import org.app.credit.security.TokenJwtConfig;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 
@@ -29,8 +30,11 @@ import static org.app.credit.security.TokenJwtConfig.*;
 
 public class JwtValidationFilter extends BasicAuthenticationFilter {
 
-    public JwtValidationFilter(AuthenticationManager authenticationManager) {
+    private final TokenJwtConfig tokenJwtConfig;
+
+    public JwtValidationFilter(AuthenticationManager authenticationManager, TokenJwtConfig tokenJwtConfig) {
         super(authenticationManager);
+        this.tokenJwtConfig = tokenJwtConfig;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
         String token = header.replace(PREFIX_TOKEN, "");
 
         try{
-            Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
+            Claims claims = Jwts.parser().verifyWith(tokenJwtConfig.getSecretKey()).build().parseSignedClaims(token).getPayload();
             String username = claims.getSubject();
             Object authoritiesClaims = claims.get("authorities");
 
