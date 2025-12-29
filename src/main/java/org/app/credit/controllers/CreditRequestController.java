@@ -2,6 +2,7 @@ package org.app.credit.controllers;
 
 import jakarta.validation.Valid;
 import org.app.credit.entities.dtos.CreditRequestCreatedDto;
+import org.app.credit.entities.dtos.CreditRequestEvaluateDto;
 import org.app.credit.entities.dtos.CreditRequestResponseDto;
 import org.app.credit.services.CreditRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +34,8 @@ public class CreditRequestController {
     }
 
     @PutMapping("/evaluate/{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody CreditRequestCreatedDto creditRequest, @PathVariable Long id) {
-        Optional<CreditRequestResponseDto> optionalCreditRequest = creditRequestService.update(id, creditRequest);
-
-        if(optionalCreditRequest.isPresent()){
-            return ResponseEntity.ok(optionalCreditRequest.get());
-        }
-
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<?> update(@Valid @RequestBody CreditRequestEvaluateDto creditRequest, @PathVariable Long id) {
+        return ResponseEntity.ok(creditRequestService.update(id, creditRequest));
     }
 
 

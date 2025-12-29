@@ -5,6 +5,7 @@ import org.app.credit.exceptions.BusinessException;
 import org.app.credit.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -58,4 +59,22 @@ public class ErrorHandlerExceptionController {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(error);
     }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Error> handleJsonParseError(HttpMessageNotReadableException ex) {
+
+        String message = "Invalid request body";
+
+        String detail = ex.getMostSpecificCause().getMessage();
+
+        Error error = new Error();
+        error.setMessage(message);
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setError(detail);
+        error.setTimestamp(LocalDateTime.now());
+
+        return ResponseEntity.badRequest().body(error);
+    }
+
 }

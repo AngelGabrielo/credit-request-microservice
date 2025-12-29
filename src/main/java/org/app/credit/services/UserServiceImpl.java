@@ -8,7 +8,6 @@ import org.app.credit.entities.dtos.UserResponseDto;
 import org.app.credit.entities.mappers.UserMapper;
 import org.app.credit.repositories.RoleRepository;
 import org.app.credit.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

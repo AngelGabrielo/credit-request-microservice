@@ -1,15 +1,13 @@
 package org.app.credit.entities.dtos;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 
 public record CreditRequestCreatedDto(
         @NotNull
         @Min(value = 1000)
+        @Max(value = 50000)
         BigDecimal amount,
 
         @NotNull
