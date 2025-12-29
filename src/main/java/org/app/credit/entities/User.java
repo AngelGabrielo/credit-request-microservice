@@ -1,7 +1,5 @@
 package org.app.credit.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -28,16 +26,11 @@ public class User {
     @NotBlank
     private String password;
 
-    @Transient
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private boolean analyst;
-
     private boolean enabled;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user",  fetch = FetchType.LAZY)
     private List<CreditRequest> creditRequests;
 
-    @JsonIgnoreProperties({"users", "handler", "hibernateLazyInitializer"})
     @ManyToMany
     @JoinTable(
             name = "users_roles",
@@ -49,6 +42,7 @@ public class User {
 
     public User() {
         creditRequests = new ArrayList<>();
+        this.roles = new ArrayList<>();
     }
 
 }

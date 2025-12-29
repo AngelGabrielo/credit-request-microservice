@@ -6,6 +6,7 @@ import org.app.credit.entities.User;
 import org.app.credit.entities.dtos.UserRegisterDto;
 import org.app.credit.entities.dtos.UserResponseDto;
 import org.app.credit.entities.mappers.UserMapper;
+import org.app.credit.exceptions.ResourceNotFoundException;
 import org.app.credit.repositories.RoleRepository;
 import org.app.credit.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,17 +31,13 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto save(UserRegisterDto userDto) {
         User user = userMapper.toEntity(userDto);
 
-        Optional<Role> optionalRoleUser = roleRepository.findByName("ROLE_CLIENT");
-        List<Role> roles = new ArrayList<>();
+        String roleName = userDto.analyst() ? "ROLE_ANALYST" : "ROLE_CLIENT";
 
-        optionalRoleUser.ifPresent(roles::add);
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new ResourceNotFoundException("Role " + roleName + " it's not found."));
 
-        if(user.isAnalyst()){
-            Optional<Role> optionalRoleAdmin = roleRepository.findByName("ROLE_ANALYST");
-            optionalRoleAdmin.ifPresent(roles::add);
-        }
+        user.setRoles(new ArrayList<>(List.of(role)));
 
-        user.setRoles(roles);
         user.setEnabled(true);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userMapper.toDto(userRepository.save(user));

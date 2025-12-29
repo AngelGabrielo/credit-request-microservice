@@ -86,22 +86,28 @@ class UserServiceImplTest {
         UserRegisterDto registerDto = new UserRegisterDto("admin", "123456", true);
 
         User userEntity = new User();
-        userEntity.setAnalyst(true);
 
         when(userMapper.toEntity(registerDto)).thenReturn(userEntity);
         // Mockeamos que existen ambos roles
-        when(roleRepository.findByName("ROLE_CLIENT")).thenReturn(Optional.of(new Role(1L, "ROLE_CLIENT", null)));
-        when(roleRepository.findByName("ROLE_ANALYST")).thenReturn(Optional.of(new Role(2L, "ROLE_ANALYST", null)));
+        when(roleRepository.findByName("ROLE_ANALYST"))
+                .thenReturn(Optional.of(new Role(2L, "ROLE_ANALYST", null)));
         when(passwordEncoder.encode(any())).thenReturn("hash");
-        when(userRepository.save(any())).thenReturn(new User());
+        when(userRepository.save(any())).thenReturn(userEntity);
         when(userMapper.toDto(any())).thenReturn(null);
 
         // --- ACT ---
         userService.save(registerDto);
 
         // --- ASSERT ---
-        // Verificamos que al guardar, la lista de roles tenga 2 elementos
-        verify(userRepository).save(argThat(user -> user.getRoles().size() == 2));
+        verify(userRepository).save(argThat(user -> {
+            //Verificamos que solo tenga 1 rol
+            boolean oneRole = user.getRoles().size() == 1;
+
+            //Verificamos que ese único rol sea el correcto
+            boolean isAnalyst = user.getRoles().get(0).getName().equals("ROLE_ANALYST");
+
+            return oneRole && isAnalyst;
+        }));
     }
 
 }

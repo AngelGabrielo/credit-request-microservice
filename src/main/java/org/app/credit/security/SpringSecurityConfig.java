@@ -49,8 +49,13 @@ public class SpringSecurityConfig {
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/requests/**").hasAnyRole("CLIENT", "ANALYST")
+
                         .requestMatchers(HttpMethod.GET, "/requests/evaluate/**").hasRole("ANALYST")
+                        .requestMatchers(HttpMethod.PUT, "/requests/evaluate/**").hasRole("ANALYST")
+
+                        .requestMatchers(HttpMethod.GET, "/requests/**").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.POST, "/requests/**").hasRole("CLIENT")
+
                         .anyRequest().authenticated())
                 .addFilter(new JwtAuthenticationFilter(authManager, tokenJwtConfig))
                 .addFilter(new JwtValidationFilter(authManager, tokenJwtConfig))

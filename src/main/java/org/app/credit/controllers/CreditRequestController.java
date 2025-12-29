@@ -7,6 +7,7 @@ import org.app.credit.entities.dtos.CreditRequestResponseDto;
 import org.app.credit.services.CreditRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,21 +19,25 @@ public class CreditRequestController {
     private CreditRequestService creditRequestService;
 
     @GetMapping("/evaluate")
+    @PreAuthorize("hasRole('ANALYST')")
     public ResponseEntity<List<CreditRequestResponseDto>> findAll() {
         return ResponseEntity.ok(creditRequestService.findAll());
     }
 
     @GetMapping("mine")
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<List<CreditRequestResponseDto>> findMine() {
         return ResponseEntity.ok(creditRequestService.findByUsername());
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<?> save(@Valid @RequestBody CreditRequestCreatedDto creditRequest) {
         return ResponseEntity.ok(creditRequestService.save(creditRequest));
     }
 
     @PutMapping("/evaluate/{id}")
+    @PreAuthorize("hasRole('ANALYST')")
     public ResponseEntity<?> update(@Valid @RequestBody CreditRequestEvaluateDto creditRequest, @PathVariable Long id) {
         return ResponseEntity.ok(creditRequestService.update(id, creditRequest));
     }
