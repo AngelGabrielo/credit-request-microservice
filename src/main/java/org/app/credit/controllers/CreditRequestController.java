@@ -2,6 +2,8 @@ package org.app.credit.controllers;
 
 import jakarta.validation.Valid;
 import org.app.credit.entities.CreditRequest;
+import org.app.credit.entities.dtos.CreditRequestCreatedDto;
+import org.app.credit.entities.dtos.CreditRequestResponseDto;
 import org.app.credit.services.CreditRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,23 +22,23 @@ public class CreditRequestController {
     private CreditRequestService creditRequestService;
 
     @GetMapping("/evaluate")
-    public ResponseEntity<List<CreditRequest>> findAll() {
+    public ResponseEntity<List<CreditRequestResponseDto>> findAll() {
         return ResponseEntity.ok(creditRequestService.findAll());
     }
 
     @GetMapping("mine")
-    public ResponseEntity<List<CreditRequest>> findMine() {
+    public ResponseEntity<List<CreditRequestResponseDto>> findMine() {
         return ResponseEntity.ok(creditRequestService.findByUsername());
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@Valid @RequestBody CreditRequest creditRequest) {
+    public ResponseEntity<?> save(@Valid @RequestBody CreditRequestCreatedDto creditRequest) {
         return ResponseEntity.ok(creditRequestService.save(creditRequest));
     }
 
     @PutMapping("/evaluate/{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody CreditRequest creditRequest, @PathVariable Long id) {
-        Optional<CreditRequest> optionalCreditRequest = creditRequestService.update(id, creditRequest);
+    public ResponseEntity<?> update(@Valid @RequestBody CreditRequestCreatedDto creditRequest, @PathVariable Long id) {
+        Optional<CreditRequestResponseDto> optionalCreditRequest = creditRequestService.update(id, creditRequest);
 
         if(optionalCreditRequest.isPresent()){
             return ResponseEntity.ok(optionalCreditRequest.get());

@@ -26,20 +26,13 @@ public class CreditRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Min(1000)
     private BigDecimal amount;
 
-    @NotNull
-    @Min(1)
     @Column(name = "period_days")
     private Integer periodDays;
 
-    @NotNull
     private LocalDateTime date;
 
-    @NotBlank
-    @Size(min = 20)
     private String reason;
 
     @Enumerated(EnumType.STRING)
@@ -47,7 +40,6 @@ public class CreditRequest {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private User user;
 
 }
