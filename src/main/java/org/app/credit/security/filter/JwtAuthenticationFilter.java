@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.app.credit.entities.User;
+import org.app.credit.entities.dtos.UserLoginDto;
 import org.app.credit.security.TokenJwtConfig;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,14 +42,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        User user = null;
+        UserLoginDto user = null;
         String username = null;
         String password = null;
 
         try {
-            user = (User) new ObjectMapper().readValue(request.getInputStream(), User.class);
-            username = user.getUsername();
-            password = user.getPassword();
+            user = new ObjectMapper().readValue(request.getInputStream(), UserLoginDto.class);
+            username = user.username();
+            password = user.password();
         } catch (StreamReadException e) {
             e.printStackTrace();
         } catch (DatabindException e){

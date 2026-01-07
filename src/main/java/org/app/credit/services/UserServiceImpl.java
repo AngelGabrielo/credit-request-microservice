@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
         String roleName = userDto.analyst() ? "ROLE_ANALYST" : "ROLE_CLIENT";
 
         Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new ResourceNotFoundException("Role " + roleName + " it's not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found."));
 
         user.setRoles(new ArrayList<>(List.of(role)));
 

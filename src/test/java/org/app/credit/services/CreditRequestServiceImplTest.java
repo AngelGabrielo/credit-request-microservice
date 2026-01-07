@@ -198,6 +198,8 @@ class CreditRequestServiceImplTest {
 
         // Verificamos que se llamó al setter con el nuevo estado
         assertEquals(RequestStateEnum.REJECTED, requestDB.getState());
+
+        verify(creditRequestRepository).save(requestDB);
     }
 
     @Test

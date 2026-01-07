@@ -5,6 +5,7 @@ import org.app.credit.entities.dtos.CreditRequestCreatedDto;
 import org.app.credit.entities.dtos.CreditRequestEvaluateDto;
 import org.app.credit.entities.dtos.CreditRequestResponseDto;
 import org.app.credit.entities.enums.RequestStateEnum;
+import org.app.credit.exceptions.BusinessException;
 import org.app.credit.services.CreditRequestService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,27 @@ class CreditRequestControllerTest {
 
     @MockBean
     private CreditRequestService creditRequestService;
+
+    @Test
+    @DisplayName("GET /requests/mine: Debería retornar lista de todas las solicitudes")
+    void findALl_shouldReturnList() throws Exception {
+        // ARRANGE
+        List<CreditRequestResponseDto> list = List.of(
+                new CreditRequestResponseDto(1L, BigDecimal.TEN, 10, "R1", "PENDING", null),
+                new CreditRequestResponseDto(2L, BigDecimal.TEN, 20, "R2", "PENDING", null)
+        );
+
+        when(creditRequestService.findAll()).thenReturn(list);
+
+        // ACT & ASSERT
+        mockMvc.perform(get("/requests/evaluate").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(2))
+                .andExpect(jsonPath("$[0].reason").value("R1"))
+                .andExpect(jsonPath("$[1].reason").value("R2"));
+
+        verify(creditRequestService).findAll();
+    }
 
     @Test
     @DisplayName("POST /requests: Debería retornar 200 OK y DTO cuando el request es válido")
@@ -77,7 +99,8 @@ class CreditRequestControllerTest {
         mockMvc.perform(post("/requests")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.amount").value("The field amount must be less than or equal to 50000"));
 
         // Verificamos que NUNCA se llamó al servicio porque falló antes (en validación)
         verify(creditRequestService, never()).save(any());
@@ -121,6 +144,29 @@ class CreditRequestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value("APPROVED"));
     }
+
+
+    @Test
+    @DisplayName("PUT /requests: Debería retornar 400 Bad Request cuando el request no existe")
+    void save_ShouldReturn400_WhenRequestDoesntExist() throws Exception {
+        // ARRANGE
+        Long id = 999L;
+        CreditRequestEvaluateDto evaluateDto = new CreditRequestEvaluateDto(RequestStateEnum.APPROVED);
+
+        when(creditRequestService.update(eq(id), any(CreditRequestEvaluateDto.class)))
+                .thenThrow(new BusinessException("Credit request not found"));
+
+        // ACT & ASSERT
+        mockMvc.perform(put("/requests/evaluate/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(evaluateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Credit request not found"));
+
+        // Verificamos que NUNCA se llamó al servicio porque falló antes (en validación)
+        verify(creditRequestService, never()).save(any());
+    }
+
 
 
 }

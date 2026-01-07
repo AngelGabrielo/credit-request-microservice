@@ -3,6 +3,7 @@ package org.app.credit.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.app.credit.entities.dtos.UserRegisterDto;
 import org.app.credit.entities.dtos.UserResponseDto;
+import org.app.credit.exceptions.ResourceNotFoundException;
 import org.app.credit.services.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,6 +70,24 @@ class AuthControllerTest {
 
         // Verificamos que NUNCA se llame al servicio
         verify(userService, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Register: Debería retornar 404 not found si el rol es distinto")
+    void register_ShouldReturn400_WhenRoleIsDifferent() throws Exception {
+        // ARRANGE
+        // Password de 3 caracteres (tu DTO pide min 6)
+        UserRegisterDto dto = new UserRegisterDto("user", "123456", false);
+        when(userService.save(any(UserRegisterDto.class)))
+                .thenThrow(new ResourceNotFoundException("Role not found."));
+
+        // ACT & ASSERT
+        mockMvc.perform(post("/auth")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Role not found."));
+
     }
 
 }

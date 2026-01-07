@@ -24,7 +24,7 @@ public class CreditRequestController {
         return ResponseEntity.ok(creditRequestService.findAll());
     }
 
-    @GetMapping("mine")
+    @GetMapping("/mine")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<List<CreditRequestResponseDto>> findMine() {
         return ResponseEntity.ok(creditRequestService.findByUsername());

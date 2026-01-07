@@ -4,8 +4,6 @@ import org.app.credit.entities.Error;
 import org.app.credit.exceptions.BusinessException;
 import org.app.credit.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -21,60 +19,41 @@ public class ErrorHandlerExceptionController {
 
     @ExceptionHandler({ResourceNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Error> userNotFoundException(Exception e){
-        Error error = new Error();
-        error.setMessage("Resource not found");
-        error.setStatus(HttpStatus.NOT_FOUND.value());
-        error.setError(e.getMessage());
-        error.setTimestamp(LocalDateTime.now());
+    public Error userNotFoundException(ResourceNotFoundException e){
+        String message = "Resource not found";
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(error);
+        return buildError(message, HttpStatus.NOT_FOUND.value(), e.getMessage());
+
     }
 
     @ExceptionHandler({BusinessException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Error> businessException(Exception e){
-        Error error = new Error();
-        error.setMessage("Business Exception");
-        error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.setError(e.getMessage());
-        error.setTimestamp(LocalDateTime.now());
+    public Error businessException(BusinessException e){
+        String message = "Business Exception";
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(error);
+        return buildError(message, HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Error> argumentException(MethodArgumentNotValidException e){
+    public Error argumentException(MethodArgumentNotValidException e){
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), "The field " + error.getField() + " " + error.getDefaultMessage()));
 
+        String message = "Argument Exception";
 
-        Error error = new Error();
-        error.setMessage("Argument Exception");
-        error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.setError(errors);
-        error.setTimestamp(LocalDateTime.now());
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(error);
+        return buildError(message, HttpStatus.BAD_REQUEST.value(), errors);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Error> handleJsonParseError(HttpMessageNotReadableException ex) {
+    private Error buildError(String message, int status, Object error){
+        Error responseError = new Error();
+        responseError.setMessage(message);
+        responseError.setStatus(status);
+        responseError.setError(error);
+        responseError.setTimestamp(LocalDateTime.now());
 
-        String message = "Invalid request body";
-
-        String detail = ex.getMostSpecificCause().getMessage();
-
-        Error error = new Error();
-        error.setMessage(message);
-        error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.setError(detail);
-        error.setTimestamp(LocalDateTime.now());
-
-        return ResponseEntity.badRequest().body(error);
+        return responseError;
     }
 
 }
